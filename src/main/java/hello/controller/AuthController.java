@@ -28,6 +28,8 @@ public class AuthController {
         this.authenticationManager = authenticationManager;
     }
 
+
+
     @GetMapping("/auth")
     @ResponseBody
     public Object auth(){
@@ -43,8 +45,54 @@ public class AuthController {
 
     }
 
+    @PostMapping("/auth/register")
+    @ResponseBody
+    public Result register(@RequestBody Map<String,Object> usernameAndPassword){
+        String username = usernameAndPassword.get("username").toString();
+        String password = usernameAndPassword.get("password").toString();
+
+        if( username == null || password == null){
+            return new Result("fail","username/password == null",false);
+        }
+
+        if( username.length() < 1 || username.length() > 15){
+            return new Result("fail","invalid username",false);
+        }
+
+        if( password.length() < 6 || password.length() > 15){
+            return new Result("fail","invalid password",false);
+        }
+
+        User user = userService.getUserByUsername(username);
+
+        if(user == null){
+            userService.save(username,password);
+            return new Result("ok","success!",false);
+        }else{
+            return new Result("fail","user already exists",false);
+        }
+
+    }
+
+    @GetMapping("/auth/logout")
+    @ResponseBody
+    public Result logout(){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        User loginedInUser = userService.getUserByUsername(username);
+
+        if(loginedInUser == null){
+            return new Result("ok","用户未登录",false);
+        }else{
+            SecurityContextHolder.clearContext();
+            return new Result("ok","注销成功",false);
+        }
+
+
+    }
+
     // 还可以直接拿到 map格式的 自动将请求的json 转换为 map
-    @PostMapping("auth/login")
+    @PostMapping("/auth/login")
     @ResponseBody
     public Result login(@RequestBody Map<String,Object> usernameAndPassword){
         String username = usernameAndPassword.get("username").toString();
