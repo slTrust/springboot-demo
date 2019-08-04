@@ -1,5 +1,7 @@
 package hello.service;
 
+import org.springframework.context.annotation.Bean;
+
 public class User {
     Integer id;
     String name;
