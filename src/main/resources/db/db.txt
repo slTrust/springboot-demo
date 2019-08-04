@@ -5,5 +5,15 @@ create table user(
   avatar varchar(100),
   created_at datetime,
   updated_at datetime
+)
 
+// 针对 高并发注册时 同一个数据库里不存在的用户名 xxx 的问题  unique 约束
+
+create table user(
+  id bigint primary key auto_increment,
+  username varchar(10) unique ,
+  encrypted_password varchar(100),
+  avatar varchar(100),
+  created_at datetime,
+  updated_at datetime
 )
