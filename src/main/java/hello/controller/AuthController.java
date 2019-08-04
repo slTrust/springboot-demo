@@ -1,12 +1,12 @@
 package hello.controller;
 
 import hello.entity.User;
+import hello.service.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,31 +19,29 @@ import java.util.Map;
 
 @Controller
 public class AuthController {
-    private UserDetailsService userDetailsService;
+    private UserService userService;
     private AuthenticationManager authenticationManager;
 
     @Inject
-    public AuthController(UserDetailsService userDetailsService, AuthenticationManager authenticationManager) {
-        this.userDetailsService = userDetailsService;
+    public AuthController(UserService userService, AuthenticationManager authenticationManager) {
+        this.userService = userService;
         this.authenticationManager = authenticationManager;
     }
-
-
 
     @GetMapping("/auth")
     @ResponseBody
     public Object auth(){
-        return new Result("ok","用户未登录",false);
-    }
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
+        User loginedInUser = userService.getUserByUsername(username);
 
-    /*
-    @PostMapping("/auth/login")
-    public void login(@RequestBody String usernameAndPwd){
-        System.out.println(usernameAndPwd);
-        // 这里返回的 json字符串
+        if(loginedInUser == null){
+            return new Result("ok","用户未登录",false);
+        }else{
+            return new Result("ok","",true,loginedInUser);
+        }
+
     }
-    */
 
     // 还可以直接拿到 map格式的 自动将请求的json 转换为 map
     @PostMapping("auth/login")
@@ -55,7 +53,7 @@ public class AuthController {
         UserDetails userDetails = null;
 
         try{
-            userDetails = userDetailsService.loadUserByUsername(username);
+            userDetails = userService.loadUserByUsername(username);
         }catch (UsernameNotFoundException e) {
             return new Result("fail","用户不存在",false);
         }
@@ -66,10 +64,11 @@ public class AuthController {
         // 鉴权
         try{
             authenticationManager.authenticate(token);
+            // 把用户信息保存在一个地方
+            // Cookie
             SecurityContextHolder.getContext().setAuthentication(token);
 
-            User loginedInUser = new User(1,"张三");
-            return new Result("ok","登录成功",true,loginedInUser);
+            return new Result("ok","登录成功",true,userService.getUserByUsername(username));
         }catch (BadCredentialsException e){
             // 鉴权识别就会抛出这个异常
             return new Result("fail","密码不正确",false);
