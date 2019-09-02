@@ -94,12 +94,33 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.0</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*IntegationTest</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
             <!-- 集成测试 -->
-            <!--<plugin>-->
-                <!--<artifactId>maven-failsafe-plugin</artifactId>-->
-                <!--<version>2.22.0</version>-->
-            <!--</plugin>-->
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.22.0</version>
+                <configuration>
+                    <includes>
+                        <include>**/*IntegationTest</include>
+                    </includes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>5.2.4</version>
+                <configuration>
+                    <url>jdbc:mysql://localhost:3306/xdml</url>
+                    <user>root</user>
+                    <password>my-secret-pw</password>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
