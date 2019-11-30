@@ -96,7 +96,7 @@
                 <version>2.22.0</version>
                 <configuration>
                     <excludes>
-                        <exclude>**/*IntegationTest</exclude>
+                        <exclude>**/*IntegrationTest</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -106,7 +106,7 @@
                 <version>2.22.0</version>
                 <configuration>
                     <includes>
-                        <include>**/*IntegationTest</include>
+                        <include>**/*IntegrationTest</include>
                     </includes>
                 </configuration>
             </plugin>
